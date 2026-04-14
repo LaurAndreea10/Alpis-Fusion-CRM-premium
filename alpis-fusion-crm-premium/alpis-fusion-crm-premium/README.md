@@ -7,7 +7,7 @@ Dashboard operațional all-in-one care combină **CRM, programări, pipeline, in
 ## Demo live
 
 ```
-https://laurandreea10.github.io/Alpis-Fusion-CRM/
+https://laurandreea10.github.io/Alpis-Fusion-CRM-premium/
 ```
 
 ## Captură de ecran
@@ -185,7 +185,7 @@ Repo-ul e configurat pentru deploy automat.
 
 ### Setup
 
-1. Push pe branch-ul `main` al repository-ului `Alpis-Fusion-CRM`.
+1. Push pe branch-ul `main` al repository-ului `Alpis-Fusion-CRM-premium`.
 2. Deschide **Settings → Pages**.
 3. La **Source**, alege **GitHub Actions**.
 4. Push orice commit pe `main`.
@@ -194,12 +194,12 @@ Repo-ul e configurat pentru deploy automat.
 Site-ul va fi publicat la:
 
 ```
-https://laurandreea10.github.io/Alpis-Fusion-CRM/
+https://laurandreea10.github.io/Alpis-Fusion-CRM-premium/
 ```
 
 ### Important
 
-- Vite config folosește `base: '/Alpis-Fusion-CRM/'` — trebuie să coincidă cu numele repo-ului
+- Vite config folosește `base: '/Alpis-Fusion-CRM-premium/'` — trebuie să coincidă cu numele repo-ului
 - GitHub Pages publică output-ul `dist`, NU sursele raw
 - Workflow-ul din `.github/workflows/deploy.yml` se ocupă de tot
 

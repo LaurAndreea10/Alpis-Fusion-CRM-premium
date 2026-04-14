@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/Alpis-Fusion-CRM/',
+  base: '/Alpis-Fusion-CRM-premium/',
 })
