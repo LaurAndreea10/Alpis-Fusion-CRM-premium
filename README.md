@@ -199,7 +199,7 @@ https://laurandreea10.github.io/Alpis-Fusion-CRM-premium/
 
 ### Important
 
-- Vite config folosește `base: '/Alpis-Fusion-CRM-premium/'` — trebuie să coincidă cu numele repo-ului
+- Vite config detectează automat `GITHUB_REPOSITORY` la build (sau `BASE_PATH` dacă este setat), ca să evite 404 la asset-uri după publicare
 - GitHub Pages publică output-ul `dist`, NU sursele raw
 - Workflow-ul din `.github/workflows/deploy.yml` se ocupă de tot
 
