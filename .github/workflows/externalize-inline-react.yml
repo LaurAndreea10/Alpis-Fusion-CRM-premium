@@ -59,7 +59,7 @@ jobs:
 
           let productionHtml = originalHtml
             .replace(/\s*<script\s+src="https:\/\/unpkg\.com\/@babel\/standalone\/babel\.min\.js"><\/script>\s*/, '\n')
-            .replace(inlineRe, '<script src="app.js?v=production-external-2026-05-17" defer></script>');
+            .replace(inlineRe, '<script src="app.js?v=production-external-2026-05-17-v2" defer></script>');
 
           fs.writeFileSync('index.html', productionHtml, 'utf8');
           console.log('Created app.js and replaced inline Babel block with external script.');
