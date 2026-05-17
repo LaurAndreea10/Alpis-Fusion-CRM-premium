@@ -1,0 +1,82 @@
+name: Externalize inline React app
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/externalize-inline-react.yml'
+      - '.github/externalize-inline-react-trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  externalize:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install esbuild
+        run: npm install esbuild
+
+      - name: Build external app.js from original JSX source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > externalize-inline-react.mjs <<'JS'
+          import fs from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          import { transformSync } from 'esbuild';
+
+          const sourceCommit = '68af3c797c101fcb38563b089a2d7695c79bb376';
+          const originalHtml = execFileSync('git', ['show', `${sourceCommit}:index.html`], { encoding: 'utf8', maxBuffer: 60 * 1024 * 1024 });
+
+          const inlineRe = /<script\s+type="text\/babel"\s+data-type="module">\n([\s\S]*?)\n\s*<\/script>/;
+          const match = originalHtml.match(inlineRe);
+          if (!match) throw new Error('Could not find original text/babel block.');
+
+          const jsxSource = match[1];
+          const compiled = transformSync(jsxSource, {
+            loader: 'jsx',
+            jsxFactory: 'React.createElement',
+            jsxFragment: 'React.Fragment',
+            target: 'es2018',
+            format: 'iife',
+            minify: true,
+            legalComments: 'none'
+          }).code;
+
+          fs.writeFileSync('app.js', compiled + '\n', 'utf8');
+
+          let productionHtml = originalHtml
+            .replace(/\s*<script\s+src="https:\/\/unpkg\.com\/@babel\/standalone\/babel\.min\.js"><\/script>\s*/, '\n')
+            .replace(inlineRe, '<script src="app.js?v=production-external-2026-05-17" defer></script>');
+
+          fs.writeFileSync('index.html', productionHtml, 'utf8');
+          console.log('Created app.js and replaced inline Babel block with external script.');
+          JS
+
+          node externalize-inline-react.mjs
+
+      - name: Commit external app bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html app.js
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "fix(build): externalize compiled React app bundle"
+          git push
