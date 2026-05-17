@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/restore-working-babel-index.yml'
       - '.github/restore-working-babel-index-trigger.txt'
+      - '.github/restore-working-babel-index-trigger-2.txt'
 
 permissions:
   contents: write
@@ -19,10 +20,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore last known working index
+      - name: Restore last known working index from blob
         run: |
           set -euo pipefail
-          git checkout 68af3c797c101fcb38563b089a2d7695c79bb376 -- index.html
+          git cat-file -p 68af3c797c101fcb38563b089a2d7695c79bb376 > index.html
 
       - name: Commit working restore
         run: |
