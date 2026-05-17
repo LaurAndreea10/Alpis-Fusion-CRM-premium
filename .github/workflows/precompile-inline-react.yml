@@ -1,0 +1,81 @@
+name: Precompile inline React
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/precompile-inline-react.yml'
+      - '.github/precompile-inline-react-trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  precompile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install esbuild
+        run: npm install esbuild
+
+      - name: Precompile text/babel script in index.html
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > precompile-inline-react.mjs <<'JS'
+          import fs from 'node:fs';
+          import { transformSync } from 'esbuild';
+
+          const path = 'index.html';
+          let html = fs.readFileSync(path, 'utf8');
+
+          const babelScriptRe = /\s*<script\s+src="https:\/\/unpkg\.com\/@babel\/standalone\/babel\.min\.js"><\/script>\s*/;
+          const inlineRe = /<script\s+type="text\/babel"\s+data-type="module">\n([\s\S]*?)\n\s*<\/script>/;
+
+          if (!inlineRe.test(html)) {
+            console.log('No text/babel block found. Nothing to precompile.');
+            process.exit(0);
+          }
+
+          const match = html.match(inlineRe);
+          const source = match[1];
+          const compiled = transformSync(source, {
+            loader: 'jsx',
+            jsxFactory: 'React.createElement',
+            jsxFragment: 'React.Fragment',
+            target: 'es2018',
+            format: 'iife',
+            minify: false,
+            legalComments: 'none'
+          }).code;
+
+          html = html.replace(babelScriptRe, '\n');
+          html = html.replace(inlineRe, `<script>\n${compiled}\n</script>`);
+
+          fs.writeFileSync(path, html, 'utf8');
+          console.log('Precompiled inline React and removed Babel standalone.');
+          JS
+
+          node precompile-inline-react.mjs
+
+      - name: Commit production index
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "fix(build): precompile inline React and remove Babel standalone"
+          git push
