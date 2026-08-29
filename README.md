@@ -1,5 +1,17 @@
 💼 ALPIS FUSION CRM — PREMIUM EDITION
 
+## Technical proof
+
+| Area | Evidence |
+| --- | --- |
+| Stack | React 18, Vite, JavaScript, CSS, GitHub Actions |
+| Architecture | Modular CRM shell with shared state, reusable operational views and local-first persistence |
+| Ownership | Product concept, UX structure, front-end implementation and documentation by Laura Andreea |
+| Setup | `npm install` → `npm run dev`; production check: `npm run build` |
+| Source | [Repository](https://github.com/LaurAndreea10/Alpis-Fusion-CRM-premium) · [Live demo](https://laurandreea10.github.io/Alpis-Fusion-CRM-premium/) |
+
+**Scope note:** portfolio-grade, single-browser demo. `localStorage` replaces a production backend; multi-user authentication and cross-device sync are not claimed.
+
 De la client nou la factură plătită, fără tool-uri separate. Un dashboard operațional all-in-one construit ca un front-end React, fără backend, fără dependințe plătite.
 
 Show Image
